@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title> Battaglia Navale Seria </title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div class="game">
+            <div class="boards">
+                <div class="grid-c">
+                    <div class=grid id="myboard">
+
+                    </div>
+                </div>
+                <div class="grid-c">
+                    <div class=grid id="enemyboard">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p id="i">
+            xdlulw
+        </p>
+        <form>
+            <input type="text" id="code">
+            <input type="button" onclick="startGame()" value="Start/Connect">
+        </form>
+        <script src="main.js" async defer></script>
+    </body>
+</html>
