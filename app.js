@@ -70,7 +70,7 @@ function checkBarca(coord, map){
     }
 }
 
-server.listen(80, () => {
+server.listen(3000, () => {
   console.log('listening on *:80');
 });
 
