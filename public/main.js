@@ -1,4 +1,4 @@
-var socket = io.connect("https://angry-murdock-478852.netlify.app");
+var socket = io();
 var gamecode = undefined;
 var playerName = undefined;
 var map = new Map();
