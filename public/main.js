@@ -1,4 +1,6 @@
 var socket = io();
+var gamecode = undefined;
+var playerName = undefined;
 
 socket.on('chat message', function(msg) {
     var item = document.getElementById("i").innerHTML = msg;
@@ -6,8 +8,12 @@ socket.on('chat message', function(msg) {
 
 socket.on('recivemove', function(msg) {
     console.log(msg);
-    var cell = document.getElementById("enemyboard" + msg.x + msg.y);
-    cell.style.backgroundColor = "blue";
+    if(msg.sender == playerName){
+        document.getElementById("myboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+    }else{
+        document.getElementById("enemyboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+    }
+    
 });
 
 grids = document.getElementsByClassName("grid");
@@ -33,17 +39,19 @@ function click(event){
 }
 
 function startGame(){
+    gamecode = document.getElementById("code").value;
+    playerName = document.getElementById("name").value;
     socket.emit("startGame", {
-        gamecode: document.getElementById("code").value,
-        sender: document.getElementById("name").value
+        gamecode: gamecode,
+        sender: playerName,
     });
     //console.log(document.getElementById("code").value);
 }
 
 function move(x, y){
     socket.emit("move", {
-        gamecode: document.getElementById("code").value,
-        sender: document.getElementById("name").value,
+        gamecode: gamecode,
+        sender: playerName,
         coord: {x, y}
     });
 }
