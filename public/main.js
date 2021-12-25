@@ -1,6 +1,8 @@
 var socket = io();
 var gamecode = undefined;
 var playerName = undefined;
+var map = new Map();
+var gameStarted = false;
 
 socket.on('chat message', function(msg) {
     var item = document.getElementById("i").innerHTML = msg;
@@ -9,12 +11,34 @@ socket.on('chat message', function(msg) {
 socket.on('recivemove', function(msg) {
     console.log(msg);
     if(msg.sender == playerName){
-        document.getElementById("myboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+        //document.getElementById("myboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+        updategrid("myboard", msg.map);
     }else{
-        document.getElementById("enemyboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+        //document.getElementById("enemyboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
+        updategrid("enemyboard", msg.map);
     }
     
 });
+
+function updategrid(id, map){
+    for (var key in map) {
+        var value = map[key];
+        console.log(key, value);
+        color = "";
+        switch(value){
+            case 1:
+                color = "blue";
+                break;
+            case 3:
+                color = "brown";
+                break;
+            case 4:
+                color = "red";
+                break;
+        }
+        document.getElementById(id + key).style.backgroundColor = color;
+     }
+}
 
 grids = document.getElementsByClassName("grid");
 [...grids].forEach(item => {
@@ -34,16 +58,23 @@ grids = document.getElementsByClassName("grid");
 });
 
 function click(event){
-    //console.log("" + event.target.dataset.x + " " + event.target.dataset.y);
-    move(event.target.dataset.x, event.target.dataset.y);
+    if(gameStarted){
+        move(event.target.dataset.x, event.target.dataset.y);
+    }else{
+        map["" + event.target.dataset.x + event.target.dataset.y] = 2;
+        document.getElementById("myboard" + event.target.dataset.x + event.target.dataset.y).style.backgroundColor = "green";
+    }    
 }
 
 function startGame(){
+    gameStarted = true;
+    
     gamecode = document.getElementById("code").value;
     playerName = document.getElementById("name").value;
     socket.emit("startGame", {
         gamecode: gamecode,
         sender: playerName,
+        map: map,
     });
     //console.log(document.getElementById("code").value);
 }

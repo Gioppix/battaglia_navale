@@ -7,7 +7,10 @@ const io = new Server(server);
 
 // app.get('/', (req, res) => {
 //   res.sendFile(__dirname + '/index.html');
-// });
+// })
+
+// undef = vuoto non scoperto, 1 = vuoto scoperto, 2 = barca non scoperta, 3 = barca scopertas 4 = barca affondata
+
 app.use(express.static("public")); //gli manda i file
 
 games = new Map();
@@ -23,29 +26,46 @@ io.on('connection', (client) => {
     client.on('startGame', (msg) => {
         client.join(msg.gamecode);
         if(games[msg.gamecode]){
-            games[msg.gamecode].second = msg.sender;
+            games[msg.gamecode].players.push(msg.sender);
+            games[msg.gamecode].maps.push(msg.map);
         }else{
             games[msg.gamecode] = {};
+            games[msg.gamecode].players = []
             games[msg.gamecode].gamecode = msg.gamecode;
-            games[msg.gamecode].first = msg.sender;
-            games[msg.gamecode].turn = msg.sender;
+            games[msg.gamecode].players.push(msg.sender);
+            games[msg.gamecode].turn = true;
+            games[msg.gamecode].maps = [];
+            games[msg.gamecode].maps.push(msg.map);
         }
     });
     client.on('move', (msg) => {
         if(games[msg.gamecode]){
-            if(games[msg.gamecode].turn == msg.sender){
+            if(
+                games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0] == msg.sender &&
+                    (
+                        games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] == undefined ||
+                        games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] == 2
+                    )
+                ){
+                checkBarca(msg, games[msg.gamecode]);
+                msg.map = games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0];
                 io.to(msg.gamecode).emit("recivemove", msg);
-                if(msg.sender == games[msg.gamecode].first){
-                    games[msg.gamecode].turn = games[msg.gamecode].second;
-                }
-                if(msg.sender == games[msg.gamecode].second){
-                    games[msg.gamecode].turn = games[msg.gamecode].first;
-                }
+                games[msg.gamecode].turn = !games[msg.gamecode].turn;
             }
         }
         console.log(msg);
     });
 });
+
+function checkBarca(msg, game){
+    cellCode = game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y];
+    if(cellCode == undefined){
+        game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] = 1
+    }
+    if(cellCode == 2){
+        game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] = 3
+    }
+}
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
