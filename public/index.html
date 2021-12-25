@@ -13,12 +13,18 @@
         <div class="game">
             <div class="boards">
                 <div class="grid-c">
-                    <div class=grid id="enemyboard">
+                    <div class="title" id="mytitle">
+                        La tua flotta
+                    </div>
+                    <div class=grid id="myboard">
 
                     </div>
                 </div>
                 <div class="grid-c">
-                    <div class=grid id="myboard">
+                    <div class="title" id="enemytitle">
+                        Flotta nemica
+                    </div>
+                    <div class=grid id="enemyboard">
 
                     </div>
                 </div>
@@ -30,7 +36,7 @@
         <form>
             Name: <input type="text" id="name">
             Code: <input type="text" id="code" value="ccc">
-            <input type="button" onclick="startGame()" value="Start/Connect">
+            <input id="boton" type="button" onclick="startGame()" value="Start/Connect">
         </form>
         <script src="main.js" async defer></script>
     </body>

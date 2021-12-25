@@ -28,6 +28,7 @@ io.on('connection', (client) => {
         if(games[msg.gamecode]){
             games[msg.gamecode].players.push(msg.sender);
             games[msg.gamecode].maps.push(msg.map);
+            io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
         }else{
             games[msg.gamecode] = {};
             games[msg.gamecode].players = []
@@ -40,30 +41,32 @@ io.on('connection', (client) => {
     });
     client.on('move', (msg) => {
         if(games[msg.gamecode]){
+            mapPointer = games[msg.gamecode].maps[!games[msg.gamecode].turn ? 1 : 0];
             if(
                 games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0] == msg.sender &&
                     (
-                        games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] == undefined ||
-                        games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] == 2
+                        mapPointer["" + msg.coord.x + msg.coord.y] == undefined ||
+                        mapPointer["" + msg.coord.x + msg.coord.y] == 2
                     )
                 ){
-                checkBarca(msg, games[msg.gamecode]);
-                msg.map = games[msg.gamecode].maps[games[msg.gamecode].turn ? 1 : 0];
+                checkBarca(msg.coord, mapPointer);
+                msg.map = games[msg.gamecode].maps[!games[msg.gamecode].turn ? 1 : 0];
                 io.to(msg.gamecode).emit("recivemove", msg);
                 games[msg.gamecode].turn = !games[msg.gamecode].turn;
+                io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
             }
         }
         console.log(msg);
     });
 });
 
-function checkBarca(msg, game){
-    cellCode = game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y];
+function checkBarca(coord, map){
+    cellCode = map["" + coord.x + coord.y];
     if(cellCode == undefined){
-        game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] = 1
+        map["" + coord.x + coord.y] = 1
     }
     if(cellCode == 2){
-        game.maps[game.turn ? 1 : 0]["" + msg.coord.x + msg.coord.y] = 3
+        map["" + coord.x + coord.y] = 3
     }
 }
 

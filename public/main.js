@@ -7,20 +7,29 @@ var gameStarted = false;
 socket.on('chat message', function(msg) {
     var item = document.getElementById("i").innerHTML = msg;
 });
+socket.on('turn', function(msg) {
+    if(msg == playerName){
+        document.getElementById("mytitle").style.backgroundColor = "rgb(0, 128, 0)";
+        document.getElementById("enemytitle").style.backgroundColor = "transparent";
+    }else{
+        document.getElementById("mytitle").style.backgroundColor = "transparent";
+        document.getElementById("enemytitle").style.backgroundColor = "rgb(0, 128, 0)";
+    }
+});
 
 socket.on('recivemove', function(msg) {
     console.log(msg);
-    if(msg.sender == playerName){
+    if(msg.sender == playerName){ //io ho mandato la mossa, va al mio nemico
         //document.getElementById("myboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
-        updategrid("myboard", msg.map);
+        updategrid("enemyboard", msg.map, false);
     }else{
         //document.getElementById("enemyboard" + msg.coord.x + msg.coord.y).style.backgroundColor = "blue";
-        updategrid("enemyboard", msg.map);
+        updategrid("myboard", msg.map, true);
     }
     
 });
 
-function updategrid(id, map){
+function updategrid(id, map, show){
     for (var key in map) {
         var value = map[key];
         console.log(key, value);
@@ -28,6 +37,11 @@ function updategrid(id, map){
         switch(value){
             case 1:
                 color = "blue";
+                break;
+            case 2:
+                if(show){
+                    color = "green";
+                }
                 break;
             case 3:
                 color = "brown";
@@ -50,6 +64,8 @@ grids = document.getElementsByClassName("grid");
             div.dataset.y = i;
             div.id = "" + item.id + j + i;
             if(item.id == "myboard"){
+                div.addEventListener("click", (event) => {addBoat(event)});
+            }else{
                 div.addEventListener("click", (event) => {click(event)});
             }
             item.append(div);
@@ -60,14 +76,19 @@ grids = document.getElementsByClassName("grid");
 function click(event){
     if(gameStarted){
         move(event.target.dataset.x, event.target.dataset.y);
-    }else{
+    }  
+}
+
+function addBoat(event){
+    if(!gameStarted){
         map["" + event.target.dataset.x + event.target.dataset.y] = 2;
         document.getElementById("myboard" + event.target.dataset.x + event.target.dataset.y).style.backgroundColor = "green";
-    }    
+    } 
 }
 
 function startGame(){
     gameStarted = true;
+    document.getElementById("boton").disabled = true;
     
     gamecode = document.getElementById("code").value;
     playerName = document.getElementById("name").value;

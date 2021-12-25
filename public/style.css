@@ -20,8 +20,16 @@ html, body {
 
 .grid-c {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     width: 50%;
+}
+
+.title {
+    display: flex;
+    justify-content: center;
+    margin: 5%;
 }
 
 .boards {
