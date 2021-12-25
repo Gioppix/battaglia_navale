@@ -1,0 +1,22 @@
+{
+  "name": "battaglia_navale",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheGioppix25/battaglia_navale.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheGioppix25/battaglia_navale/issues"
+  },
+  "homepage": "https://github.com/TheGioppix25/battaglia_navale#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
