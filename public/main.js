@@ -9,11 +9,11 @@ socket.on('chat message', function(msg) {
 });
 socket.on('turn', function(msg) {
     if(msg == playerName){
-        document.getElementById("mytitle").style.backgroundColor = "rgb(128, 128, 0)";
+        document.getElementById("mytitle").style.backgroundColor = "rgb(0, 128, 0)";
         document.getElementById("enemytitle").style.backgroundColor = "transparent";
     }else{
         document.getElementById("mytitle").style.backgroundColor = "transparent";
-        document.getElementById("enemytitle").style.backgroundColor = "rgb(0, 128, 0)";
+        document.getElementById("enemytitle").style.backgroundColor = "rgb(128, 0, 0)";
     }
 });
 
