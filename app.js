@@ -71,8 +71,8 @@ function checkBarca(coord, map){
     }
 }
 
-server.listen(3000, () => {
-  console.log('listening on *:80');
+server.listen(process.env.PORT || 3000, () => {
+  console.log('listening');
 });
 
 setInterval(() => {
