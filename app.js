@@ -11,6 +11,7 @@ const io = new Server(server);
 // })
 
 // undef = vuoto non scoperto, 1 = vuoto scoperto, 2 = barca non scoperta, 3 = barca scopertas 4 = barca affondata
+// 0 = da cominciare, 1 = ocminciato, 2 = finito
 
 app.use(express.static("public")); //gli manda i file
 
@@ -27,12 +28,16 @@ io.on('connection', (client) => {
     client.on('startGame', (msg) => {
         client.join(msg.gamecode);
         if(games[msg.gamecode]){
-            games[msg.gamecode].players.push(msg.sender);
-            games[msg.gamecode].maps.push(msg.map);
-            io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
+            if(games[msg.gamecode].players.lenght != 2){
+                games[msg.gamecode].status = 1;
+                games[msg.gamecode].players.push(msg.sender);
+                games[msg.gamecode].maps.push(msg.map);
+                io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
+            }
         }else{
             games[msg.gamecode] = {};
-            games[msg.gamecode].players = []
+            games[msg.gamecode].status = 0;
+            games[msg.gamecode].players = [];
             games[msg.gamecode].gamecode = msg.gamecode;
             games[msg.gamecode].players.push(msg.sender);
             games[msg.gamecode].turn = true;
@@ -41,7 +46,7 @@ io.on('connection', (client) => {
         }
     });
     client.on('move', (msg) => {
-        if(games[msg.gamecode]){
+        if(games[msg.gamecode].status == 1){
             mapPointer = games[msg.gamecode].maps[!games[msg.gamecode].turn ? 1 : 0];
             if(
                 games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0] == msg.sender &&
@@ -53,8 +58,13 @@ io.on('connection', (client) => {
                 checkBarca(msg.coord, mapPointer);
                 msg.map = games[msg.gamecode].maps[!games[msg.gamecode].turn ? 1 : 0];
                 io.to(msg.gamecode).emit("recivemove", msg);
-                games[msg.gamecode].turn = !games[msg.gamecode].turn;
-                io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
+                if(checkValue(mapPointer, 2)){
+                    games[msg.gamecode].turn = !games[msg.gamecode].turn;
+                    io.to(msg.gamecode).emit("turn", games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0]);
+                }else{
+                    games[msg.gamecode].status = 2;
+                    io.to(msg.gamecode).emit("gameEnd", msg.sender);
+                }
             }
         }
         console.log(msg);
@@ -80,3 +90,12 @@ setInterval(() => {
     console.log(games);
 
 }, 3000);
+
+function checkValue(mappp, searchValue) {
+    for (i in mappp) {
+        if (mappp[i] === searchValue){
+            return true;
+        }
+    }
+    return false;
+}

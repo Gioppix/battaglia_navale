@@ -7,6 +7,16 @@ var gameStarted = false;
 socket.on('chat message', function(msg) {
     var item = document.getElementById("i").innerHTML = msg;
 });
+socket.on('gameEnd', function(msg) {
+    let a = document.createElement("div");
+    a.className = "gameover";
+    if(msg == playerName){
+        a.innerHTML = "Gioco finito. Hai vinto";
+    }else{
+        a.innerHTML = "Gioco finito. Hai perso";
+    }
+    document.body.append(a);
+});
 socket.on('turn', function(msg) {
     if(msg == playerName){
         document.getElementById("mytitle").style.backgroundColor = "rgb(0, 128, 0)";
