@@ -14,46 +14,7 @@ jobs:
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
-        key: |
-          -----BEGIN OPENSSH PRIVATE KEY-----
-          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
-          -----END OPENSSH PRIVATE KEY-----
-
+        key: ${{ secrets.SuperSecret }}
         known_hosts: " "
     - name: Add git.evennode.com to known_hosts
       run: |
