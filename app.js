@@ -1,5 +1,7 @@
 const express = require('express');
+const res = require('express/lib/response');
 const { createServer } = require('http');
+const { getPriority } = require('os');
 const { Server } = require("socket.io");
 
 const app = express();
@@ -49,7 +51,7 @@ io.on('connection', (client) => {
         if(games[msg.gamecode].status == 1){
             mapPointer = games[msg.gamecode].maps[!games[msg.gamecode].turn ? 1 : 0];
             if(
-                games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0] == msg.sender &&
+                games[msg.gamecode].players[games[msg.gamecode].turn ? 1 : 0] == msg.sender && //TURNI!!!!!
                     (
                         mapPointer["" + msg.coord.x + msg.coord.y] == undefined ||
                         mapPointer["" + msg.coord.x + msg.coord.y] == 2
@@ -67,7 +69,7 @@ io.on('connection', (client) => {
                 }
             }
         }
-        console.log(msg);
+        //console.log(msg);
     });
 });
 
@@ -79,6 +81,80 @@ function checkBarca(coord, map){
     if(cellCode == 2){
         map["" + coord.x + coord.y] = 3
     }
+    checkAf(coord.x, coord.y, map)
+}
+function checkAf(x, y, mapp){
+    newM = [];
+    for (i = 0; i<10; i++){
+        temp = []
+        for (j = 0; j < 10; j++){
+            temp.push(0);
+        }
+        newM.push(temp);
+    }
+    for (i in mapp) {
+        newM[i[0]][i[1]] = mapp[i];
+    }
+    //console.log(mapp);
+    //console.log(newM);
+
+    reso = [];
+    puro = {};
+    puro.p = true; //per passarlo con reference
+    //console.log("Index: %d", indexx);
+    //console.log("-------------------------")
+    checkAd(x, y, newM, reso, puro);
+    if(puro.p){
+        //console.log(reso)
+        reso.forEach(ee => {
+            mapp[ee] = 4;
+            //console.log("each: %d", ee)
+        });
+        
+    }
+    
+}
+
+function checkAd(i, j, m, reso, puro){
+    //console.log(m[i]);
+    //console.log("i, j: "+ i + j + " v: " + m[i][j])
+    if(m[i][j] == 0 || m[i][j] == 1 ||  m[i][j] == 4 ){
+        //console.log("finito")
+        return;
+    }
+    if(m[i][j] == 2){
+        puro.p = false;
+        return;
+    }
+    if(m[i][j] == 3){
+        reso.push("" + i + j);
+        //return;
+    }
+    if(checkCell(i - 1, j) && !reso.includes("" + (i - 1) + j)){
+        checkAd(i - 1, j, m, reso, puro);
+        //console.log("3 if")
+    }
+    // - 0 per forzarli a int
+    //console.log("check ", "" + i + (j + 1))
+    if(checkCell(i, j - 0 + 1) && !reso.includes("" + i + (j - 0 + 1))){
+        checkAd(i, j - 0 + 1, m, reso, puro);
+        //console.log("4 if")
+    }
+    if(checkCell(i - 0 + 1, j) && !reso.includes("" + (i - 0 + 1) + j)){
+        checkAd(i - 0 + 1, j, m, reso, puro);
+        //console.log("prima if")
+    }
+    if(checkCell(i, j - 1) && !reso.includes("" + i + (j - 1))){
+        checkAd(i, j - 1, m, reso, puro);
+        //console.log("2 if")
+    }
+}
+
+function checkCell(x, y){
+    if(x >= 0 && x < 10 && y >= 0 && y < 10){
+        return true;
+    }
+    return false;
 }
 
 server.listen(process.env.PORT || 3000, () => {
@@ -87,7 +163,7 @@ server.listen(process.env.PORT || 3000, () => {
 
 setInterval(() => {
     io.emit('chat message', Date.now()); // This will emit the event to all connected clients
-    console.log(games);
+    //console.log(games);
 
 }, 3000);
 
