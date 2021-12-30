@@ -46,7 +46,7 @@ m0 = [
     ]
   ];
 m0
-checkAd(6, 7, m0, resoo,  puro0)
+checkAd(6, 7, m0, resoo,  puro0) //qui si possono cambiare le coordinate
 if(puro0.p){
     resoo.forEach((e, i) => {
         m0[e[0]][e[1]] = 4;
